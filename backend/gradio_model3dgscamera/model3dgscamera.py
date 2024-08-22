@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import (
-    TYPE_CHECKING, Callable, Sequence, Optional, Tuple
+    TYPE_CHECKING, Any, Callable, Sequence, Optional, Tuple
 )
 
 from gradio_client import handle_file
+from gradio_client.documentation import document
 
 from gradio.components.base import Component
 from gradio.data_classes import GradioModel, FileData
@@ -16,11 +17,16 @@ from gradio.events import Events
 if TYPE_CHECKING:
     from gradio.components import Timer
 
+@document()
 class Model3DGSCameraData(GradioModel):
+    """
+    A dataclass for file and camera poses.
+    """
     file: FileData
     camera_pos: Optional[Tuple[float, float, float]] = None
     camera_rot: Optional[Tuple[float, float, float]] = None
 
+@document()
 class Model3DGSCamera(Component):
     """
     Creates a component allows users view 3D Model files (.splat or .ply).
@@ -58,15 +64,15 @@ class Model3DGSCamera(Component):
     ):
         """
         Parameters:
-            value: path to (.obj, .glb, .stl, .gltf, .splat, or .ply) file to show in model3D viewer. If callable, the function will be called whenever the app loads to set the initial value of the component.
-            height: The height of the model3D component, specified in pixels if a number is passed, or in CSS units if a string is passed.
-            width:
-            camera_width:
-            camera_height:
-            camera_fx:
-            camera_fy:
-            camera_near:
-            camera_far:
+            value: path to (.obj, .glb, .stl, .gltf, .splat, or .ply) file to show in Model3DGSCamera viewer. If callable, the function will be called whenever the app loads to set the initial value of the component.
+            height: The height of the Model3DGSCamera component, specified in pixels if a number is passed, or in CSS units if a string is passed.
+            width: The width of the Model3DGSCamera component, specified in pixels if a number is passed, or in CSS units if a string is passed.
+            camera_width: The width of camera in pixels.
+            camera_height: The height of camera in pixels.
+            camera_fx: The camera focal length.
+            camera_fy: The camera focal length.
+            camera_near: The camera near clip distance.
+            camera_far: The camera far clip distance.
             interactive: if True, will allow users to upload a file; if False, can only be used to display files. If not provided, this is inferred based on whether the component is used as an input or output.
             label: The label for this component. Appears above the component and is also used as the header if there are a table of examples for this component. If None and used in a `gr.Interface`, the label will be the name of the parameter this component is assigned to.
             show_label: if True, will display label.
@@ -153,6 +159,9 @@ class Model3DGSCamera(Component):
             camera_pos=value[1],
             camera_rot=value[2]
         )
+
+    def api_info(self) -> dict[str, Any]:
+        return super().api_info()
 
     def example_payload(self):
         return Model3DGSCameraData(file=handle_file(
